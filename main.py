@@ -43,3 +43,32 @@ def get_comments(novel_id: int, chapter_id: int = None, paragraph_id: int = None
     if paragraph_id:
         query = query.filter(Comment.paragraph_id == paragraph_id)
     return query.all()
+
+# 点赞评论
+@app.post("/comments/{comment_id}/like/")
+def like_comment(comment_id: int, db: Session = Depends(get_db)):
+    # 查询评论是否存在
+    comment = db.query(Comment).filter(Comment.id == comment_id).first()
+    if not comment:
+        raise HTTPException(status_code=404, detail="Comment not found")
+
+    # 增加点赞数
+    comment.likes += 1
+    db.commit()
+    db.refresh(comment)
+    return {"status": "success", "likes": comment.likes}
+
+# 取消点赞
+@app.post("/comments/{comment_id}/unlike/")
+def unlike_comment(comment_id: int, db: Session = Depends(get_db)):
+    # 查询评论是否存在
+    comment = db.query(Comment).filter(Comment.id == comment_id).first()
+    if not comment:
+        raise HTTPException(status_code=404, detail="Comment not found")
+
+    # 减少点赞数（确保不低于 0）
+    if comment.likes > 0:
+        comment.likes -= 1
+        db.commit()
+        db.refresh(comment)
+    return {"status": "success", "likes": comment.likes}

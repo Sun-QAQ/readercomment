@@ -22,3 +22,7 @@ class CommentResponse(CommentBase):
 
     class Config:
         orm_mode = True
+
+# 点赞请求模型
+class LikeRequest(BaseModel):
+    comment_id: int
