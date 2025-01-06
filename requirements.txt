@@ -1,0 +1,2 @@
+安装需要的依赖
+pip install fastapi uvicorn sqlalchemy psycopg2
